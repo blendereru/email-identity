@@ -22,4 +22,7 @@
         </p>
     </form>
 </div>
-<p>Don't have account yet? <a asp-action="Register">Click here to register</a></p>
+<p>Don't have account yet? <a asp-action="Register">Click here to register</a></p><br />
+<form method="post" asp-action="ExternalLogin" asp-controller="Account">
+    <input type="submit" value="Log in using Google" />
+</form>

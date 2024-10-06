@@ -18,6 +18,12 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
+builder.Services.AddAuthentication()
+    .AddGoogle(opts =>
+    {
+        opts.ClientId = builder.Configuration["GoogleServices:ClientId"]!;
+        opts.ClientSecret = builder.Configuration["GoogleServices:ClientSecret"]!;
+    });
 builder.Services.AddDbContext<ApplicationContext>(opts =>
 {
     opts.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));

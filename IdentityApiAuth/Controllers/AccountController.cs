@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using IdentityApiAuth.Models;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace IdentityApiAuth.Controllers;
 
@@ -61,5 +63,59 @@ public class AccountController : Controller
         }
 
         return View(model);
+    }
+
+    [HttpPost]
+    public IActionResult ExternalLogin()
+    {
+        var redirectUrl = Url.Action("ExternalLoginCallback", "Account");
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(GoogleDefaults.DisplayName, redirectUrl);
+        return Challenge(properties);
+    }
+    public async Task<IActionResult> ExternalLoginCallback(string? remoteError)
+    {
+        if (remoteError != null)
+        {
+            ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
+            return View("Login");
+        }
+
+        var info = await _signInManager.GetExternalLoginInfoAsync();
+        if (info == null)
+        {
+            ModelState.AddModelError(string.Empty, "Error loading external login information.");
+            return View("Login");
+        }
+
+        var signInResult =
+            await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey,
+                false, true);
+        if (signInResult.Succeeded)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+        else
+        {
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (email != null)
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    user = new IdentityUser()
+                    {
+                        UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
+                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+                    };
+                    await _userManager.CreateAsync(user);
+                }
+
+                await _userManager.AddLoginAsync(user, info);
+                await _signInManager.SignInAsync(user, false);
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        return NotFound();
     }
 }
