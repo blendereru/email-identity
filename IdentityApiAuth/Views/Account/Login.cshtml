@@ -1,0 +1,25 @@
+@model IdentityApiAuth.Models.LoginModel
+<div asp-validation-summary="All">
+    <form method="post">
+        <p>
+            <label asp-for="Email"></label><br/>
+            <input type="text" asp-for="Email"/>
+            <span asp-validation-for="Email"></span>
+        </p>
+        <p>
+            <label asp-for="Password"></label><br/>
+            <input type="password" asp-for="Password"/>
+            <span asp-validation-for="Password"></span>
+        </p>
+        <p>
+            <label asp-for="RememberMe">
+                <input asp-for="RememberMe"/>
+                @Html.DisplayNameFor(m => m.RememberMe)
+            </label>
+        </p>
+        <p>
+            <input type="submit" value="Login" />
+        </p>
+    </form>
+</div>
+<p>Don't have account yet? <a asp-action="Register">Click here to register</a></p>

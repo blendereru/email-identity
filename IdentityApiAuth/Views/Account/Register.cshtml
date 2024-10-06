@@ -1,0 +1,23 @@
+@model IdentityApiAuth.Models.RegisterModel
+<div asp-validation-summary="All">
+    <form method="post">
+        <p>
+            <label asp-for="Email"></label><br/>
+            <input type="text" asp-for="Email"/>
+            <span asp-validation-for="Email"></span>
+        </p>
+        <p>
+            <label asp-for="Password"></label><br/>
+            <input type="password" asp-for="Password"/>
+            <span asp-validation-for="Password"></span>
+        </p>
+        <p>
+            <label asp-for="ConfirmPassword"></label><br/>
+            <input type="password" asp-for="ConfirmPassword"/>
+            <span asp-validation-for="ConfirmPassword"></span>
+        </p>
+        <p>
+            <input type="submit" value="Register" />
+        </p>
+    </form>
+</div>
