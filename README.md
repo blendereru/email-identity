@@ -42,11 +42,11 @@ First of all, AddIdentity<TUser, TRole> method has the following implementation
         });
 ```
 
-* DefaultAuthenticateScheme: the scheme that is used when no parameter in `AuthenticateAsync()` method is specified. `AuthenticateAsync()`
+* `DefaultAuthenticateScheme`: the scheme that is used when no parameter in `AuthenticateAsync()` method is specified. `AuthenticateAsync()`
 is a method that reads and validates the user's identity.
-* DefaultChallengeScheme: the scheme that is used when no parameter in `ChallengeAsync()` is specified. ChallengeAsync() is a method
+* `DefaultChallengeScheme`: the scheme that is used when no parameter in `ChallengeAsync()` is specified. ChallengeAsync() is a method
 that prompts the user to authenticate, and for the case if the user is not, redirects him to a login page or starts an external **OAuth** flow.
-* DefaultSignInScheme: the scheme that is used to sign in user, the process to determine how the user's identity is persisted.
+* `DefaultSignInScheme`: the scheme that is used to sign in user, the process to determine how the user's identity is persisted.
 
 the separate cookies specified through `.AddCookie()` serve different purposes too.
 1) `.AddCookie(IdentityConstants.ApplicationScheme, o => ...)`: used to persist the user's identity after login.
@@ -82,7 +82,7 @@ If the login is successful, Google redirects the user back to your callback URL 
   > https://localhost:<your_port>/Account/ExternalLoginCallback?code=xyz&state=abc
 
   The authorization code in the URL is proof that Google successfully authenticated the user.
-* In your ExternalLoginCallback method, the ASP.NET Core authentication middleware uses the authorization code to contact Google and retrieve the user’s profile information (like their email, name, etc.).
+* In your `ExternalLoginCallback` method, the ASP.NET Core authentication middleware uses the authorization code to contact Google and retrieve the user’s profile information (like their email, name, etc.).
   This exchange happens behind the scenes, and ASP.NET Core doesn't expose this part to you directly.
 * The Google authentication middleware:
 
