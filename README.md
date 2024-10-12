@@ -5,7 +5,7 @@ The project is intended to understand the way asp.net core identity works. The g
 3) Also can use google to authenticate to the system.
 
 ## How does asp.net core identity work ?
-First of all, AddIdentity<TUser, TRole> method has the following implementation
+First of all, `AddIdentity<TUser, TRole>()` method has the following implementation
  ```csharp
  // Services used by identity
         services.AddAuthentication(options =>
@@ -44,7 +44,7 @@ First of all, AddIdentity<TUser, TRole> method has the following implementation
 
 * `DefaultAuthenticateScheme`: the scheme that is used when no parameter in `AuthenticateAsync()` method is specified. `AuthenticateAsync()`
 is a method that reads and validates the user's identity.
-* `DefaultChallengeScheme`: the scheme that is used when no parameter in `ChallengeAsync()` is specified. ChallengeAsync() is a method
+* `DefaultChallengeScheme`: the scheme that is used when no parameter in `ChallengeAsync()` is specified. `ChallengeAsync()` is a method
 that prompts the user to authenticate, and for the case if the user is not, redirects him to a login page or starts an external **OAuth** flow.
 * `DefaultSignInScheme`: the scheme that is used to sign in user, the process to determine how the user's identity is persisted.
 
@@ -65,7 +65,7 @@ public IActionResult ExternalLogin()
 }
 ```
 When clicking "Log in using Google", controller sends the user to Google for authentication from where the user is redirected to `ExternalLoginCallback()`.
-The line `var info = await _signInManager.GetExternalLoginInfoAsync();` internally calls `AuthenticateAsync()` on the **ExternalScheme**, which reads the temporary cookie set during the external login process.
+The line `var info = await _signInManager.GetExternalLoginInfoAsync();` internally calls `AuthenticateAsync()` on the `ExternalScheme`, which reads the temporary cookie set during the external login process.
 Here's really important to understand how Google transports your data to our app.
 
 * When the app initiates the login request through the Challenge method:
@@ -88,15 +88,15 @@ If the login is successful, Google redirects the user back to your callback URL 
 
        1) Uses the authorization code to request an access token from Google.
        2) Uses the access token to request the user’s profile data (like email, name, and other claims).
-* The user’s claims (like their email and name) are wrapped into an ExternalLoginInfo object by the middleware. The ExternalScheme cookie is created at this point to temporarily store the user’s claims until the final sign-in step.
+* The user’s claims (like their email and name) are wrapped into an `ExternalLoginInfo` object by the middleware. The `ExternalScheme` cookie is created at this point to temporarily store the user’s claims until the final sign-in step.
 
 Another unfamiliar method is `await _signInManager.ExternalLoginSignInAsync();`
-The method looks for a record in the AspNetUserLogins table where the LoginProvider and ProviderKey match the ones provided.
-If found, it associates the external provider with a local user account (from the AspNetUsers table).
-If the external login is valid (i.e., the user exists in the database with the same provider and key), it signs the user in.
-If 2FA is enabled for the user and bypassTwoFactor is set to false, the user will be asked to provide a second factor (e.g., SMS code, authenticator app).
-If bypassTwoFactor is true, it skips this step.
-Then, the user is signed in by creating an authentication cookie, which maintains the user’s login session.
+* The method looks for a record in the `AspNetUserLogins` table where the `LoginProvider` and `ProviderKey` match the ones provided.
+* If found, it associates the external provider with a local user account (from the `AspNetUsers` table).
+* If the external login is valid (i.e., the user exists in the database with the same provider and key), it signs the user in.
+* If 2FA is enabled for the user and `bypassTwoFactor` is set to false, the user will be asked to provide a second factor (e.g., SMS code, authenticator app).
+* If `bypassTwoFactor` is true, it skips this step.
+* Then, the user is signed in by creating an authentication cookie, which maintains the user’s login session.
 
 # ToDos
 1. [ ] Add email validation system
