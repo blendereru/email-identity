@@ -98,11 +98,18 @@ Another unfamiliar method is `await _signInManager.ExternalLoginSignInAsync();`
 * If `bypassTwoFactor` is true, it skips this step.
 * Then, the user is signed in by creating an authentication cookie, which maintains the user’s login session.
 
+### Issue of `Challenge()` and `new ChallengeResult()`
+The `ExternalLogin()` action method previously returned the `ChallengeResult` in the following way
+```csharp
+var properties = _signInManager.ConfigureExternalAuthenticationProperties(GoogleDefaults.AuthenticationScheme, redirectUrl);
+return Challenge(properties);
+```
+This configuration says to use the `DefaultChallengeScheme` which is assumed that the cookie scheme should be used to handle the challenge
 # ToDos
 1. [ ] Add email validation system
 2. [ ] Use MassTransit producer-consumer to send email
 3. [ ] Use Hangfire to schedule emails 
-4. [ ] Fix the issue of user's being unable to redirect to google's page for authentication
+4. [x] Fix the issue of user's being unable to redirect to google's page for authentication
 
 
 

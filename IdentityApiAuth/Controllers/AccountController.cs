@@ -64,14 +64,14 @@ public class AccountController : Controller
 
         return View(model);
     }
-
     [HttpPost]
     public IActionResult ExternalLogin()
     {
         var redirectUrl = Url.Action("ExternalLoginCallback", "Account");
-        var properties = _signInManager.ConfigureExternalAuthenticationProperties(GoogleDefaults.DisplayName, redirectUrl);
-        return Challenge(properties);
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(GoogleDefaults.AuthenticationScheme, redirectUrl);
+        return new ChallengeResult(GoogleDefaults.AuthenticationScheme, properties);
     }
+    [AllowAnonymous]
     public async Task<IActionResult> ExternalLoginCallback(string? remoteError)
     {
         if (remoteError != null)
@@ -79,7 +79,6 @@ public class AccountController : Controller
             ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
             return View("Login");
         }
-
         var info = await _signInManager.GetExternalLoginInfoAsync();
         if (info == null)
         {
