@@ -104,11 +104,26 @@ The `ExternalLogin()` action method previously returned the `ChallengeResult` in
 var properties = _signInManager.ConfigureExternalAuthenticationProperties(GoogleDefaults.AuthenticationScheme, redirectUrl);
 return Challenge(properties);
 ```
-This configuration says to use the `DefaultChallengeScheme` which is assumed that the cookie scheme should be used to handle the challenge
+This configuration says to use the `DefaultChallengeScheme` which is assumed that the cookie scheme should be used to handle the challenge.
+
+## The email service part
+The raw `SmtpClient` is used in the project, though this approach is generally not recommended for the reason that
+* It does not support connection pooling, meaning multiple email sends in a short time can overwhelm the SMTP server or exhaust network resources.
+* `SmtpClient` may struggle with advanced features like OAuth2 or modern SMTP providers that require non-trivial authentication workflows, such as Google `SMTP` with `OAuth` tokens.
+### About smtp protocol(s)
+  * SMTP protocol is used to send from a client (or application) to a mail server or between mail servers.
+> Typical Scenario:
+You configure your app or email client (like Outlook) to send email via smtp.gmail.com.
+If you send an email from your-email@gmail.com, it will travel from your app → smtp.gmail.com → recipient’s email server (e.g., Outlook, Yahoo).
+  * IMAP protocol is used to retrieve emails from the mail server
+> Typical Scenario: When you open your Gmail inbox on a new device, IMAP syncs the server's mailbox with your client, so you see the same emails and folders on all devices.
+  * POP3 protocol is an older protocol used to download emails from the server to a local device.
+> Typical Scenario: With POP3, emails are often removed from the server after download, which makes it less ideal for multi-device setups.
+
 # ToDos
-1. [ ] Add email validation system
+1. [x] Add email validation system
 2. [ ] Use MassTransit producer-consumer to send email
-3. [ ] Use Hangfire to schedule emails 
+3. [x] Use Hangfire to schedule emails 
 4. [x] Fix the issue of user's being unable to redirect to google's page for authentication
 
 
