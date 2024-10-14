@@ -1,4 +1,7 @@
 using System.Security.Claims;
+using System.Text.Encodings.Web;
+using System.Web;
+using Hangfire;
 using IdentityApiAuth.Models;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
@@ -11,10 +14,13 @@ public class AccountController : Controller
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
-    public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+    private readonly IEmailSender _emailSender;
+    public AccountController(UserManager<IdentityUser> userManager, 
+        SignInManager<IdentityUser> signInManager, IEmailSender emailSender)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _emailSender  = emailSender;
     }
     [HttpGet]
     public IActionResult Register() => View();
@@ -32,7 +38,8 @@ public class AccountController : Controller
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
-                await _signInManager.SignInAsync(user, false);
+                await SendConfirmationEmailAsync(user);
+                await _signInManager.PasswordSignInAsync(user, model.Password!, true, false);
                 return RedirectToAction("Index", "Home");
             }
 
@@ -117,4 +124,39 @@ public class AccountController : Controller
 
         return NotFound();
     }
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    {
+        if (userId == null || token == null)
+        {
+            ViewBag.Message = "The link is Invalid or Expired";
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound("The user is not found");
+        }
+
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+        if (result.Succeeded)
+        {
+            ViewBag.Message = "Thank you for confirming your email";
+            return View();
+        }
+        ViewBag.Message = "Email cannot be confirmed";
+        return View();
+    }
+    [NonAction]
+    private async Task SendConfirmationEmailAsync(IdentityUser user)
+    {
+        ArgumentNullException.ThrowIfNull(user,nameof(user));
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var confirmationLink = Url.Action("ConfirmEmail", "Account",
+            new { userId = user.Id, token = token }, protocol: HttpContext.Request.Scheme);
+        var body = $"Please confirm your email by <a href='{HtmlEncoder.Default.Encode(confirmationLink)}'>clicking here</a>.";
+        await _emailSender.SendEmailAsync(user.Email!, "Confirm your email", body, true);
+    }
+
 }
