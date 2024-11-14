@@ -1,4 +1,4 @@
-# email-identity <img src="https://badge.ttsalpha.com/api?label=status&status=passing&color=green" alt="status"/>
+# email-identity
 The project is intended to understand the way asp.net core identity works. The general idea is following:
 1) User goes by default path "/"(e.g "Account/Login") where he enters his login and password
 2) If user doesn't have account in the system he clicks the button for registering
